@@ -12,6 +12,8 @@ const AddUser = () => {
     // used to toggle loader for pan
     const [panLoader, setPanLoader] = useState(false);
     const navigate = useNavigate();
+    // for handling submit button enable/disable
+    const [enabeleSubmit, setEnableSubmit] = useState(false);
     // for handling multiple entries of address
     const [address, setAddress] = useState([{ line1: '', line2: '', postCode: '', city: '', state: '', postalCodeLoader: false }])
 
@@ -42,14 +44,15 @@ const AddUser = () => {
                 (res) => {
                     if (res.data.fullName) {
                         setFullName(res.data.fullName)
+                        setEnableSubmit(true)
                     }
-                    document.getElementById('submit-btn').classList.remove('disabled')
                     setPanLoader(false)
                 }
             )
         }
         //Empty full name when PAN is not filled or it is wrong
         setFullName('')
+        setEnableSubmit(false)
     }
 
     function verifyMobileno(e) {
@@ -238,7 +241,7 @@ const AddUser = () => {
                         </div>
                     }
                     <div className='submit d-flex justify-content-between gap-3 mt-4'>
-                        <input type='submit' id='submit-btn' className='btn p-0 m-0 disabled' value='Submit'></input>
+                        <input type='submit' id='submit-btn' className={`btn p-0 m-0 ${enabeleSubmit == false ? 'disabled' : ''} `} value='Submit'></input>
                         <div className='btn p-0 m-0' id='view-users' onClick={() => navigate('/users')}> View Users</div>
                     </div>
                 </div>
