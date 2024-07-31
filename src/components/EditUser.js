@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Swal from 'sweetalert2';
 
 function EditUser({ user, setShowModel }) {
+
     const [show, setShow] = useState(true);
     const handleClose = () => { setShow(false); setShowModel(false) };
     const [userData, setUserData] = useState({});
@@ -17,11 +19,13 @@ function EditUser({ user, setShowModel }) {
         e.preventDefault();
         setShowModel(false);
         console.log("Updated user data:", userData);
+        // Storing updated data into localstorage with pan as key
         localStorage.setItem(userData.pan, JSON.stringify(userData))
     }
 
     function handleChange(e, key, index) {
         const { name, value } = e.target;
+        // if it is address filed then we check address no and update that  address else update other fileds based on name parameter
         if (key === 'address') {
             const updatedAddresses = [...userData[key]];
             updatedAddresses[index] = { ...updatedAddresses[index], [name]: value };
@@ -32,12 +36,19 @@ function EditUser({ user, setShowModel }) {
     }
 
     function deleteAddress(e, index) {
-        const deleteConfirm = window.confirm('Do You Really Want to Delete')
-        if (deleteConfirm) {
-            const updatedAddresses = [...userData['address']]
-            const filterAddress = updatedAddresses.filter((address, i) => i != index)
-            setUserData({ ...userData, 'address': filterAddress })  
-        }
+        Swal.fire({
+            title: 'Do You Really Want to Delete',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const updatedAddresses = [...userData['address']]
+                const filterAddress = updatedAddresses.filter((address, i) => i != index)
+                setUserData({ ...userData, 'address': filterAddress })
+            }
+        })
     }
 
     return (
@@ -54,8 +65,10 @@ function EditUser({ user, setShowModel }) {
                                     if (key === 'address') {
                                         return userData[key].map((address, idx) => (
                                             <div key={idx}>
-                                                <h5 className='text-center'>Address {idx + 1}</h5>
-                                                {idx != 0 && <div className='btn btn-danger' onClick={(e) => deleteAddress(e, idx)}><i class="bi bi-trash"></i> </div>}
+                                                <div className='d-flex justify-content-between'>
+                                                    <h5 className='text-center'>Address {idx + 1}</h5>
+                                                    {idx != 0 && <div className='btn btn-danger' onClick={(e) => deleteAddress(e, idx)}><i class="bi bi-trash"></i> </div>}
+                                                </div>
                                                 {Object.keys(address).map((item) => (
                                                     <div className='d-flex flex-column' key={item}>
                                                         <label>{item}</label>
@@ -76,7 +89,7 @@ function EditUser({ user, setShowModel }) {
                                     }
                                 })}
                                 <div>
-                                    <Button type='submit' className='btn btn-info w-100'>Update</Button>
+                                    <Button type='submit' className='btn update-btn w-100'>Update</Button>
                                 </div>
                             </div>
                         </form>

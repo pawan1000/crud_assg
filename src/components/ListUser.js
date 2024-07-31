@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import EditUser from './EditUser';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+
 const ListUser = () => {
   const [users, setUsers] = useState([]);
   const [showModel, setShowModel] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null)
-  const [loadAgain,setLoadAgain]=useState(false);
-  let navigate=useNavigate();
+  const [loadAgain, setLoadAgain] = useState(false);
+  let navigate = useNavigate();
 
   useEffect(() => {
     const tempUsers = [];
+    // Fetching all Users Data Present in LocalStorage
     for (let index = 0; index < localStorage.length; index++) {
       const key = localStorage.key(index);
       const value = localStorage.getItem(key);
@@ -17,45 +20,45 @@ const ListUser = () => {
     }
     setUsers(tempUsers)
     console.log(users);
-  }, [showModel,selectedUser,loadAgain])
+  }, [showModel, selectedUser, loadAgain])
 
-  function handleDelete(e,user) {
-    e.preventDefault(); // Prevent default behavior
-
-    let confirmDelete = window.confirm('Do you want to delete?');
-
-    if (confirmDelete) {
-        // Check if the user key exists in localStorage
+  function handleDelete(e, user) {
+    e.preventDefault();
+    Swal.fire({
+      title: 'Do You Really Want to Delete',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No',
+    }).then((result) => {
+      if (result.isConfirmed) {
         if (localStorage.getItem(user.pan)) {
-            localStorage.removeItem(user.pan);
-            console.log(`Deleted user with pan: ${user.pan}`);
-            setLoadAgain(!loadAgain)
-        } else {
-            console.log(`No user found with pan: ${user.pan}`);
+          localStorage.removeItem(user.pan);
+          setLoadAgain(!loadAgain)
         }
-    }
-}
-
+      }
+    })
+  }
 
   return (
     <div>
       <div className='users p-2 m-4'>
         {
           users.length > 0 ? (
-            <table className='table-bordered  w-100'>
+            <table className='table table-bordered  w-100'>
               <thead >
-                <tr className='text-center bg-info'>
-                  <th>Sr.No</th>
-                  <th>PAN</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Mobile No</th>
-                  <th>Add Line 1</th>
-                  <th>Add Line 2</th>
-                  <th>Postcode</th>
-                  <th>State</th>
-                  <th>City</th>
-                  <th colSpan={2}>Actions</th>
+                <tr className='text-center bg-info '>
+                  <th style={{ backgroundColor: '#FF9EAA' }}>Sr.No</th>
+                  <th style={{ backgroundColor: '#FF9EAA' }}>PAN</th>
+                  <th style={{ backgroundColor: '#FF9EAA' }}>Name</th>
+                  <th style={{ backgroundColor: '#FF9EAA' }}>Email</th>
+                  <th style={{ backgroundColor: '#FF9EAA' }}>Mobile No</th>
+                  <th style={{ backgroundColor: '#FF9EAA' }}>Add Line 1</th>
+                  <th style={{ backgroundColor: '#FF9EAA' }}>Add Line 2</th>
+                  <th style={{ backgroundColor: '#FF9EAA' }}>Postcode</th>
+                  <th style={{ backgroundColor: '#FF9EAA' }}>State</th>
+                  <th style={{ backgroundColor: '#FF9EAA' }}>City</th>
+                  <th style={{ backgroundColor: '#FF9EAA' }} colSpan={2}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -67,7 +70,7 @@ const ListUser = () => {
                         {index === 0 && (
                           <>
                             <td rowSpan={user.address.length}>{srno + 1}</td>
-                            <td rowSpan={user.address.length}>{user.pan}</td>
+                            <td rowSpan={user.address.length}><span style={{ backgroundColor: '#37B7C3', padding: '4px 8px' }}>{user.pan}</span></td>
                             <td rowSpan={user.address.length}>{user.fullname}</td>
                             <td rowSpan={user.address.length}>{user.email}</td>
                             <td rowSpan={user.address.length}>{user.mobileno}</td>
@@ -81,10 +84,10 @@ const ListUser = () => {
                         {index === 0 && (
                           <>
                             <td rowSpan={user.address.length} style={{ cursor: 'pointer' }} onClick={() => { setSelectedUser(user); setShowModel(true) }} data-toggle="modal" data-target="#exampleModalCenter">
-                              <i className="bi bi-pencil"></i>
+                              <i className="bi bi-pencil text-info"></i>
                             </td>
-                            <td rowSpan={user.address.length} style={{ cursor: 'pointer' }} onClick={(e) => {  handleDelete(e,user) }}>
-                              <i className="bi bi-trash"></i>
+                            <td rowSpan={user.address.length} style={{ cursor: 'pointer' }} onClick={(e) => { handleDelete(e, user) }}>
+                              <i className="bi bi-trash text-danger"></i>
                             </td>
                           </>
                         )}
@@ -99,7 +102,7 @@ const ListUser = () => {
           ) : (<h1 className='text-center'>No User Found !!! Pls add user.
             <br>
             </br>
-            <u className='text-info' style={{cursor:'pointer'}} onClick={()=>navigate('/')}>Add User</u>
+            <u className='text-info' style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>Add User</u>
           </h1>)
         }
       </div>
